@@ -22,6 +22,7 @@
 // along with AdiURLShortener.  If not, see <http://www.gnu.org/licenses/>.
 
 #import "AdiURLShortener.h"
+#import "CallGooGl.h"
 
 @implementation AdiURLShortener
 
@@ -47,18 +48,20 @@
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"((http|https)://w{0,3}\\.?[^\\s,:]+)" options:0 error:&error];
         NSArray *matches = [regex matchesInString:typed options:0 range:NSMakeRange(0, typedLength)];
         NSMutableDictionary *replacements = [[NSMutableDictionary alloc] init];
+        NSOperationQueue *shortenedUrls = [[NSOperationQueue alloc] init];
         for (NSTextCheckingResult *match in matches) {
             NSString *matchText = [typed substringWithRange:[match range]];
             if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
                 NSRange range = [match rangeAtIndex:1];
                 NSString *url = [typed substringWithRange:range];
-                NSString *shortened = [self shorten:url];
-                NSLog(@"found link: %@, shortened to: %@", url, shortened);
-                [replacements setValue:shortened forKey:url];
+                CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
+                [replacements setValue:worker forKey:url];
+                [shortenedUrls addOperation:worker];
             } else {
                 NSLog(@"link to an image: %@", matchText);
             }
         }
+        [shortenedUrls waitUntilAllOperationsAreFinished];
         if ([replacements count]) {
             returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements]];
         }
@@ -66,36 +69,12 @@
     return returnMe;
 }
 
-- (NSString *)shorten:(NSString *)url {
-    NSString *returnMe = url;
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@"https://www.googleapis.com/urlshortener/v1/url"]];
-    [request setHTTPMethod:@"POST"];
-    
-    NSDictionary *json = @{@"longUrl":url};
-    
-    NSError *error;
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:json options:0 error:&error];
-    [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
-    [request setHTTPBody:postData];
-    NSURLResponse *response;
-    NSHTTPURLResponse *httpResponse;
-    NSData* responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    
-    httpResponse = (NSHTTPURLResponse*) response;
-    NSInteger statusCode = [httpResponse statusCode];
-    
-    if (statusCode == 200) {
-        json = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
-        returnMe = [json valueForKey:@"id"];
-    } else {
-        NSLog(@"statusCode is %ld", (long)statusCode);
-    }
-    return returnMe;
-}
-
 - (NSMutableString *)replaceAll:(NSMutableString *)string using:(NSDictionary *)replacements {
     for (NSString *key in replacements) {
-        [string replaceOccurrencesOfString:key withString:[replacements valueForKey:key] options: NSLiteralSearch range:NSMakeRange(0, [string length])];
+        NSString *replace = [[replacements valueForKey:key] shortened];
+        if (replace) {
+            [string replaceOccurrencesOfString:key withString:replace options: NSLiteralSearch range:NSMakeRange(0, [string length])];
+        }
     }
     return string;
 }

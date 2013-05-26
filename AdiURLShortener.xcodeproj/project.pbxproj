@@ -10,6 +10,7 @@
 		6B41C5401750CA08009BCB2C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6B41C53E1750CA08009BCB2C /* InfoPlist.strings */; };
 		6B41C5491750CE87009BCB2C /* AdiURLShortener.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B41C5481750CE87009BCB2C /* AdiURLShortener.m */; };
 		6B9150541752515D006445DC /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 6B9150531752515D006445DC /* COPYING */; };
+		6BAC2103175277B5004E9DDF /* CallGooGl.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC2102175277B5004E9DDF /* CallGooGl.m */; };
 		6BE229AD1750F45F00099D78 /* AIUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BE229AC1750F45F00099D78 /* AIUtilities.framework */; };
 		6BE3720A1750F618004A0A7E /* Adium.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BE372091750F618004A0A7E /* Adium.framework */; };
 		6BE3720E1751269E004A0A7E /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BE3720D1751269E004A0A7E /* Constants.m */; };
@@ -23,6 +24,8 @@
 		6B41C5471750CE87009BCB2C /* AdiURLShortener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdiURLShortener.h; sourceTree = "<group>"; };
 		6B41C5481750CE87009BCB2C /* AdiURLShortener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdiURLShortener.m; sourceTree = "<group>"; };
 		6B9150531752515D006445DC /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		6BAC2101175277B5004E9DDF /* CallGooGl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallGooGl.h; sourceTree = "<group>"; };
+		6BAC2102175277B5004E9DDF /* CallGooGl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallGooGl.m; sourceTree = "<group>"; };
 		6BE229AC1750F45F00099D78 /* AIUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AIUtilities.framework; sourceTree = "<group>"; };
 		6BE372091750F618004A0A7E /* Adium.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Adium.framework; sourceTree = "<group>"; };
 		6BE3720C1751269E004A0A7E /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -45,6 +48,8 @@
 		6B41C5291750CA08009BCB2C = {
 			isa = PBXGroup;
 			children = (
+				6BAC2101175277B5004E9DDF /* CallGooGl.h */,
+				6BAC2102175277B5004E9DDF /* CallGooGl.m */,
 				6B9150531752515D006445DC /* COPYING */,
 				6BE3720C1751269E004A0A7E /* Constants.h */,
 				6BE3720D1751269E004A0A7E /* Constants.m */,
@@ -165,6 +170,7 @@
 			files = (
 				6B41C5491750CE87009BCB2C /* AdiURLShortener.m in Sources */,
 				6BE3720E1751269E004A0A7E /* Constants.m in Sources */,
+				6BAC2103175277B5004E9DDF /* CallGooGl.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
