@@ -117,7 +117,7 @@
 }
 
 - (NSString *)pluginURL {
-	return @"http://jcs.org/";
+	return @"https://github.com/micheleb/AdiURLShortener";
 }
 
 @end
