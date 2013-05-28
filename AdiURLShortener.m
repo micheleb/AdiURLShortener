@@ -54,9 +54,11 @@
             if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
                 NSRange range = [match rangeAtIndex:1];
                 NSString *url = [typed substringWithRange:range];
-                CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
-                [replacements setValue:worker forKey:url];
-                [shortenedUrls addOperation:worker];
+                if ([url length] > MIN_LENGTH_TO_SHORTEN) {
+                    CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
+                    [replacements setValue:worker forKey:url];
+                    [shortenedUrls addOperation:worker];
+                }
             } else {
                 NSLog(@"link to an image: %@", matchText);
             }
