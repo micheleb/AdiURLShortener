@@ -23,49 +23,65 @@
 
 #import "AdiURLShortener.h"
 #import "CallGooGl.h"
+#import <AIUtilities/AIDictionaryAdditions.h>
+#import <Adium/AIPreferenceControllerProtocol.h>
 
 @implementation AdiURLShortener
 
 - (void)installPlugin {
+    prefs = [Prefs preferencePaneForPlugin:self];
+    
+    NSDictionary *defaults = [NSDictionary dictionaryNamed:@"AdiURLShortenerDefaults" forClass:[self class]];
+    if (defaults) {
+        [[adium preferenceController] registerDefaults:defaults forGroup:APP_NAME];
+    }
+    [self setPrettifier:[[AdiURLPrettifier alloc] init]];
     [[adium contentController] registerContentFilter:self ofType:AIFilterContent direction:AIFilterOutgoing];
+    [[adium contentController] registerHTMLContentFilter:_prettifier direction:AIFilterOutgoing];
 }
 
 - (void)uninstallPlugin {
     [[adium contentController] unregisterContentFilter:self];
+    [[adium contentController] unregisterHTMLContentFilter:_prettifier];
 }
 
 - (NSAttributedString *)filterAttributedString:(NSAttributedString *)inAttributedString context:(id)context {
     NSAttributedString *returnMe = inAttributedString;
-    NSString *typed = [inAttributedString string];
-    NSMutableString *changed = [[NSMutableString alloc]initWithString:typed];
-    NSUInteger typedLength = [typed length];
-    
-    if (typedLength > MIN_LENGTH_TO_SHORTEN) {
-        NSError *error = nil;
-        // these are here so not to conflict with the awesome adinline plugin
-        NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
+    if ([[[adium preferenceController] preferenceForKey:KEY_ENABLED group:APP_NAME] boolValue]) {
+        NSString *typed = [inAttributedString string];
+        NSMutableString *changed = [[NSMutableString alloc]initWithString:typed];
+        NSUInteger typedLength = [typed length];
+        int minLengthToShorten = [[[adium preferenceController] preferenceForKey:KEY_URL_MIN_LENGTH group:APP_NAME] intValue];
         
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"((http|https)://w{0,3}\\.?[^\\s,:]+)" options:0 error:&error];
-        NSArray *matches = [regex matchesInString:typed options:0 range:NSMakeRange(0, typedLength)];
-        NSMutableDictionary *replacements = [[NSMutableDictionary alloc] init];
-        NSOperationQueue *shortenedUrls = [[NSOperationQueue alloc] init];
-        for (NSTextCheckingResult *match in matches) {
-            NSString *matchText = [typed substringWithRange:[match range]];
-            if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
-                NSRange range = [match rangeAtIndex:1];
-                NSString *url = [typed substringWithRange:range];
-                if ([url length] > MIN_LENGTH_TO_SHORTEN) {
-                    CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
-                    [replacements setValue:worker forKey:url];
-                    [shortenedUrls addOperation:worker];
+        if (typedLength > minLengthToShorten) {
+            NSError *error = nil;
+            // these are here so not to conflict with the awesome adinline plugin
+            NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
+            
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"((http|https)://w{0,3}\\.?[^\\s]+)" options:0 error:&error];
+            NSArray *matches = [regex matchesInString:typed options:0 range:NSMakeRange(0, typedLength)];
+            NSMutableDictionary *replacements = [[NSMutableDictionary alloc] init];
+            NSOperationQueue *shortenedUrls = [[NSOperationQueue alloc] init];
+            
+            for (NSTextCheckingResult *match in matches) {
+                NSString *matchText = [typed substringWithRange:[match range]];
+                if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
+                    NSRange range = [match rangeAtIndex:1];
+                    NSString *url = [typed substringWithRange:range];
+                    if ([url length] > minLengthToShorten) {
+                        CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
+                        [replacements setValue:worker forKey:url];
+                        [shortenedUrls addOperation:worker];
+                    }
+                } else {
+                    NSLog(@"link to an image: %@", matchText);
                 }
-            } else {
-                NSLog(@"link to an image: %@", matchText);
             }
-        }
-        [shortenedUrls waitUntilAllOperationsAreFinished];
-        if ([replacements count]) {
-            returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements]];
+            
+            [shortenedUrls waitUntilAllOperationsAreFinished];
+            if ([replacements count]) {
+                returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements]];
+            }
         }
     }
     return returnMe;
@@ -90,7 +106,7 @@
 }
 
 - (NSString *)pluginVersion {
-	return @"0.1";
+	return @"0.2";
 }
 
 - (NSString *)pluginDescription {

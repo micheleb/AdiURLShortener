@@ -7,16 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B04608F1755E8B600AA1BCA /* AdiURLPrettifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B04608E1755E8B600AA1BCA /* AdiURLPrettifier.m */; };
+		6B0C920C1779CD86007BC86D /* AdiURLShortenerDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B0C920B1779CD86007BC86D /* AdiURLShortenerDefaults.plist */; };
+		6B0C920E1779D9FC007BC86D /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6B0C920D1779D9FC007BC86D /* icon.png */; };
 		6B41C5401750CA08009BCB2C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6B41C53E1750CA08009BCB2C /* InfoPlist.strings */; };
 		6B41C5491750CE87009BCB2C /* AdiURLShortener.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B41C5481750CE87009BCB2C /* AdiURLShortener.m */; };
 		6B9150541752515D006445DC /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 6B9150531752515D006445DC /* COPYING */; };
 		6BAC2103175277B5004E9DDF /* CallGooGl.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC2102175277B5004E9DDF /* CallGooGl.m */; };
+		6BD7A03B17799CBD00AADA8B /* Prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BD7A03A17799CBD00AADA8B /* Prefs.m */; };
+		6BD7A03D1779A41100AADA8B /* Prefs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6BD7A03C1779A41100AADA8B /* Prefs.xib */; };
 		6BE229AD1750F45F00099D78 /* AIUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BE229AC1750F45F00099D78 /* AIUtilities.framework */; };
 		6BE3720A1750F618004A0A7E /* Adium.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BE372091750F618004A0A7E /* Adium.framework */; };
-		6BE3720E1751269E004A0A7E /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BE3720D1751269E004A0A7E /* Constants.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6B04608D1755E8B600AA1BCA /* AdiURLPrettifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdiURLPrettifier.h; sourceTree = "<group>"; };
+		6B04608E1755E8B600AA1BCA /* AdiURLPrettifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdiURLPrettifier.m; sourceTree = "<group>"; };
+		6B0C920B1779CD86007BC86D /* AdiURLShortenerDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = AdiURLShortenerDefaults.plist; sourceTree = "<group>"; };
+		6B0C920D1779D9FC007BC86D /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		6B41C5321750CA08009BCB2C /* AdiURLShortener.AdiumPlugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdiURLShortener.AdiumPlugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B41C53D1750CA08009BCB2C /* AdiURLShortener-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AdiURLShortener-Info.plist"; sourceTree = "<group>"; };
 		6B41C53F1750CA08009BCB2C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -26,10 +34,11 @@
 		6B9150531752515D006445DC /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		6BAC2101175277B5004E9DDF /* CallGooGl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallGooGl.h; sourceTree = "<group>"; };
 		6BAC2102175277B5004E9DDF /* CallGooGl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallGooGl.m; sourceTree = "<group>"; };
+		6BD7A03917799CBD00AADA8B /* Prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Prefs.h; sourceTree = "<group>"; };
+		6BD7A03A17799CBD00AADA8B /* Prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Prefs.m; sourceTree = "<group>"; };
+		6BD7A03C1779A41100AADA8B /* Prefs.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Prefs.xib; sourceTree = "<group>"; };
 		6BE229AC1750F45F00099D78 /* AIUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AIUtilities.framework; sourceTree = "<group>"; };
 		6BE372091750F618004A0A7E /* Adium.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Adium.framework; sourceTree = "<group>"; };
-		6BE3720C1751269E004A0A7E /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
-		6BE3720D1751269E004A0A7E /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,14 +54,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B0C920A1779CD6C007BC86D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6B0C920D1779D9FC007BC86D /* icon.png */,
+				6B0C920B1779CD86007BC86D /* AdiURLShortenerDefaults.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		6B0C920F1779DB80007BC86D /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6BD7A03C1779A41100AADA8B /* Prefs.xib */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
 		6B41C5291750CA08009BCB2C = {
 			isa = PBXGroup;
 			children = (
+				6B0C920F1779DB80007BC86D /* View */,
+				6B0C920A1779CD6C007BC86D /* Resources */,
+				6BD7A03917799CBD00AADA8B /* Prefs.h */,
+				6BD7A03A17799CBD00AADA8B /* Prefs.m */,
+				6B04608D1755E8B600AA1BCA /* AdiURLPrettifier.h */,
+				6B04608E1755E8B600AA1BCA /* AdiURLPrettifier.m */,
 				6BAC2101175277B5004E9DDF /* CallGooGl.h */,
 				6BAC2102175277B5004E9DDF /* CallGooGl.m */,
 				6B9150531752515D006445DC /* COPYING */,
-				6BE3720C1751269E004A0A7E /* Constants.h */,
-				6BE3720D1751269E004A0A7E /* Constants.m */,
 				6B41C5471750CE87009BCB2C /* AdiURLShortener.h */,
 				6B41C5481750CE87009BCB2C /* AdiURLShortener.m */,
 				6B41C53B1750CA08009BCB2C /* AdiURLShortener */,
@@ -158,6 +188,9 @@
 			files = (
 				6B41C5401750CA08009BCB2C /* InfoPlist.strings in Resources */,
 				6B9150541752515D006445DC /* COPYING in Resources */,
+				6BD7A03D1779A41100AADA8B /* Prefs.xib in Resources */,
+				6B0C920C1779CD86007BC86D /* AdiURLShortenerDefaults.plist in Resources */,
+				6B0C920E1779D9FC007BC86D /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,8 +202,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B41C5491750CE87009BCB2C /* AdiURLShortener.m in Sources */,
-				6BE3720E1751269E004A0A7E /* Constants.m in Sources */,
 				6BAC2103175277B5004E9DDF /* CallGooGl.m in Sources */,
+				6B04608F1755E8B600AA1BCA /* AdiURLPrettifier.m in Sources */,
+				6BD7A03B17799CBD00AADA8B /* Prefs.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

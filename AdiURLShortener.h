@@ -23,10 +23,19 @@
 
 #import <Adium/AIPlugin.h>
 #import <Adium/AIContentControllerProtocol.h>
-#import "Constants.h"
+#import <Adium/AIPreferencePane.h>
+#import "AdiURLPrettifier.h"
+#import "Prefs.h"
+
+#define APP_NAME @"AdiURLShortener"
+#define KEY_ENABLED	@"Enable automatic shortening of URLs"
+#define KEY_URL_MIN_LENGTH @"Minimum URL length to shorten"
+#define KEY_SHORTENER_TYPE @"Shortening style"
 
 @interface AdiURLShortener : AIPlugin <AIContentFilter> {
-    
+    AIPreferencePane *prefs;
 }
+
+@property(strong) AdiURLPrettifier *prettifier;
 
 @end
