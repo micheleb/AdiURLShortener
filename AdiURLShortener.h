@@ -31,7 +31,9 @@
 #define KEY_ENABLED	@"Enable automatic shortening of URLs"
 #define KEY_URL_MIN_LENGTH @"Minimum URL length to shorten"
 #define KEY_SHORTENER_TYPE @"Shortening style"
-
+#define VALUE_PRETTIFY 0
+#define VALUE_GOO_GL 1
+#define FORMAT_SHORT_URL @"adi_url"
 @interface AdiURLShortener : AIPlugin <AIContentFilter> {
     AIPreferencePane *prefs;
 }

@@ -37,7 +37,7 @@
     }
     [self setPrettifier:[[AdiURLPrettifier alloc] init]];
     [[adium contentController] registerContentFilter:self ofType:AIFilterContent direction:AIFilterOutgoing];
-    [[adium contentController] registerHTMLContentFilter:_prettifier direction:AIFilterOutgoing];
+    [[adium contentController] registerHTMLContentFilter:_prettifier direction:AIFilterIncoming];
 }
 
 - (void)uninstallPlugin {
@@ -47,7 +47,8 @@
 
 - (NSAttributedString *)filterAttributedString:(NSAttributedString *)inAttributedString context:(id)context {
     NSAttributedString *returnMe = inAttributedString;
-    if ([[[adium preferenceController] preferenceForKey:KEY_ENABLED group:APP_NAME] boolValue]) {
+    int shortenerType = [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue];
+    if ([[[adium preferenceController] preferenceForKey:KEY_ENABLED group:APP_NAME] boolValue] && shortenerType == VALUE_GOO_GL) {
         NSString *typed = [inAttributedString string];
         NSMutableString *changed = [[NSMutableString alloc]initWithString:typed];
         NSUInteger typedLength = [typed length];
@@ -69,29 +70,39 @@
                     NSRange range = [match rangeAtIndex:1];
                     NSString *url = [typed substringWithRange:range];
                     if ([url length] > minLengthToShorten) {
-                        CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
-                        [replacements setValue:worker forKey:url];
-                        [shortenedUrls addOperation:worker];
-                    }
+                        [self shortenWithGooGl:url using:replacements withQueue:shortenedUrls];                    }
                 } else {
                     NSLog(@"link to an image: %@", matchText);
                 }
             }
-            
             [shortenedUrls waitUntilAllOperationsAreFinished];
             if ([replacements count]) {
-                returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements]];
+                returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements shortenerType:shortenerType]];
             }
         }
     }
     return returnMe;
 }
 
-- (NSMutableString *)replaceAll:(NSMutableString *)string using:(NSDictionary *)replacements {
+- (void)shortenWithGooGl:(NSString *)url using:(NSDictionary *)replacements withQueue:(NSOperationQueue *)queue {
+    CallGooGl *worker = [[CallGooGl alloc] initWithUrl:url];
+    [replacements setValue:worker forKey:url];
+    [queue addOperation:worker];
+}
+
+
+- (NSMutableString *)replaceAll:(NSMutableString *)string using:(NSDictionary *)replacements shortenerType:(int)shortenerType {
     for (NSString *key in replacements) {
-        NSString *replace = [[replacements valueForKey:key] shortened];
+        NSString *replace;
+        // yes, same ugliness as before, using a dict with different types depending on a boolean... meh.
+        if (shortenerType == VALUE_GOO_GL) {
+            replace = [[replacements valueForKey:key] shortened];
+        } else {
+            replace = [replacements valueForKey:key];
+        }
         if (replace) {
             [string replaceOccurrencesOfString:key withString:replace options: NSLiteralSearch range:NSMakeRange(0, [string length])];
+            NSLog(@"this is the replaced string: %@", string);
         }
     }
     return string;
