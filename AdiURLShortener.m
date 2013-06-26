@@ -35,24 +35,27 @@
     if (defaults) {
         [[adium preferenceController] registerDefaults:defaults forGroup:APP_NAME];
     }
-    [self setPrettifier:[[AdiURLPrettifier alloc] init]];
+    _incomingPrettifier = [[AdiURLPrettifier alloc] init];
+    _outgoingPrettifier = [[AdiURLPrettifier alloc] init];
     [[adium contentController] registerContentFilter:self ofType:AIFilterContent direction:AIFilterOutgoing];
-    [[adium contentController] registerHTMLContentFilter:_prettifier direction:AIFilterIncoming];
+    [[adium contentController] registerHTMLContentFilter:_incomingPrettifier direction:AIFilterIncoming];
+    [[adium contentController] registerHTMLContentFilter:_outgoingPrettifier direction:AIFilterOutgoing];
 }
 
 - (void)uninstallPlugin {
     [[adium contentController] unregisterContentFilter:self];
-    [[adium contentController] unregisterHTMLContentFilter:_prettifier];
+    [[adium contentController] unregisterHTMLContentFilter:_incomingPrettifier];
+    [[adium contentController] unregisterHTMLContentFilter:_outgoingPrettifier];
 }
 
 - (NSAttributedString *)filterAttributedString:(NSAttributedString *)inAttributedString context:(id)context {
     NSAttributedString *returnMe = inAttributedString;
     int shortenerType = [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue];
-    if ([[[adium preferenceController] preferenceForKey:KEY_ENABLED group:APP_NAME] boolValue] && shortenerType == VALUE_GOO_GL) {
+    if ([[[adium preferenceController] preferenceForKey:KEY_OUTGOING_ENABLED group:APP_NAME] boolValue] && shortenerType == VALUE_GOO_GL) {
         NSString *typed = [inAttributedString string];
         NSMutableString *changed = [[NSMutableString alloc]initWithString:typed];
         NSUInteger typedLength = [typed length];
-        int minLengthToShorten = [[[adium preferenceController] preferenceForKey:KEY_URL_MIN_LENGTH group:APP_NAME] intValue];
+        int minLengthToShorten = [[[adium preferenceController] preferenceForKey:KEY_MIN_OUTGOING group:APP_NAME] intValue];
         
         if (typedLength > minLengthToShorten) {
             NSError *error = nil;
@@ -77,7 +80,7 @@
             }
             [shortenedUrls waitUntilAllOperationsAreFinished];
             if ([replacements count]) {
-                returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements shortenerType:shortenerType]];
+                returnMe = [[NSMutableAttributedString alloc]initWithString:[self replaceAll:changed using:replacements]];
             }
         }
     }
@@ -91,15 +94,10 @@
 }
 
 
-- (NSMutableString *)replaceAll:(NSMutableString *)string using:(NSDictionary *)replacements shortenerType:(int)shortenerType {
+- (NSMutableString *)replaceAll:(NSMutableString *)string using:(NSDictionary *)replacements {
     for (NSString *key in replacements) {
         NSString *replace;
-        // yes, same ugliness as before, using a dict with different types depending on a boolean... meh.
-        if (shortenerType == VALUE_GOO_GL) {
             replace = [[replacements valueForKey:key] shortened];
-        } else {
-            replace = [replacements valueForKey:key];
-        }
         if (replace) {
             [string replaceOccurrencesOfString:key withString:replace options: NSLiteralSearch range:NSMakeRange(0, [string length])];
             NSLog(@"this is the replaced string: %@", string);

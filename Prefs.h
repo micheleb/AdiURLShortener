@@ -26,9 +26,15 @@
 
 @interface Prefs : AIAdvancedPreferencePane {}
 
-@property (assign) IBOutlet NSButton *pluginEnabled;
-@property (assign) IBOutlet NSTextField *urlMinLength;
+// items that set preferences
+@property (assign) IBOutlet NSButton *incomingEnabled;
+@property (assign) IBOutlet NSTextField *incomingMinLength;
+@property (assign) IBOutlet NSButton *outgoingEnabled;
+@property (assign) IBOutlet NSTextField *outgoingMinLength;
 @property (assign) IBOutlet NSMatrix *whichShortener;
+
+// items that do nothing at all
+@property (assign) IBOutlet NSTextField *prettifyWarning;
 
 - (IBAction)radioSelectorAction:(id)sender;
 

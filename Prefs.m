@@ -48,15 +48,26 @@
 
 
 -(void)viewDidLoad {    
-    NSInteger pluginEnabled=[[[adium preferenceController] preferenceForKey:KEY_ENABLED
+    NSInteger incomingEnabled=[[[adium preferenceController] preferenceForKey:KEY_INCOMING_ENABLED
         group:APP_NAME] boolValue];
-    [_pluginEnabled setState:pluginEnabled];
+    [_incomingEnabled setState:incomingEnabled];
+    [_incomingMinLength setEnabled:incomingEnabled];
+    
+    NSInteger minIncomingLength = [[[adium preferenceController] preferenceForKey:KEY_MIN_INCOMING group:APP_NAME] intValue];
+    [_incomingMinLength setStringValue:[NSString stringWithFormat:@"%li", minIncomingLength]];
+    
+    NSInteger outgoingEnabled=[[[adium preferenceController] preferenceForKey:KEY_OUTGOING_ENABLED
+                                                                        group:APP_NAME] boolValue];
+    [_outgoingEnabled setState:outgoingEnabled];
+    [_outgoingMinLength setEnabled:outgoingEnabled];
+    
+    NSInteger minOutgoingLength = [[[adium preferenceController] preferenceForKey:KEY_MIN_OUTGOING group:APP_NAME] intValue];
+    [_outgoingMinLength setStringValue:[NSString stringWithFormat:@"%li", minOutgoingLength]];
     
     NSInteger type = [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue];
     [_whichShortener selectCellWithTag:type];
-    
-    NSInteger urlMinLength = [[[adium preferenceController] preferenceForKey:KEY_URL_MIN_LENGTH group:APP_NAME] intValue];
-    [_urlMinLength setStringValue:[NSString stringWithFormat:@"%li", urlMinLength]];
+    if (type == VALUE_PRETTIFY)
+        _prettifyWarning.hidden = false;
 }
 
 -(void) setPreference: (id)value forKey:(NSString *)key {
@@ -69,13 +80,17 @@
 }
 
 - (IBAction)changePreference:(id)sender {
-    if (sender == _pluginEnabled) {
-        [self setPreference: [NSNumber numberWithBool:[sender state]] forKey:KEY_ENABLED];
-        
-        [_urlMinLength setEnabled:[sender state]];
+    if (sender == _incomingEnabled) {
+        [self setPreference: [NSNumber numberWithBool:[sender state]] forKey:KEY_INCOMING_ENABLED];
+        [_incomingMinLength setEnabled:[sender state]];
+    } else if (sender == _outgoingEnabled) {
+        [self setPreference: [NSNumber numberWithBool:[sender state]] forKey:KEY_OUTGOING_ENABLED];
+        [_outgoingMinLength setEnabled:[sender state]];
         [_whichShortener setEnabled:[sender state]];
-    } else if (sender == _urlMinLength) {
-        [self setPreference:[NSNumber numberWithInt:[[sender stringValue] intValue]] forKey:KEY_URL_MIN_LENGTH];
+    } else if (sender == _incomingMinLength) {
+        [self setPreference:[NSNumber numberWithInt:[[sender stringValue] intValue]] forKey:KEY_MIN_INCOMING];
+    } else if (sender == _outgoingMinLength) {
+        [self setPreference:[NSNumber numberWithInt:[[sender stringValue] intValue]] forKey:KEY_MIN_OUTGOING];
     }
 }
 
@@ -84,6 +99,18 @@
     NSLog(@"Radio selector %li",(long)selectedItem);
     
     [self setPreference:[NSNumber numberWithInt:(int)selectedItem] forKey:KEY_SHORTENER_TYPE];
+    
+    switch (selectedItem) {
+        case VALUE_GOO_GL:
+            _prettifyWarning.hidden = true;
+            break;
+        case VALUE_PRETTIFY:
+            _prettifyWarning.hidden = false;
+            break;
+        default:
+            _prettifyWarning.hidden = true;
+            break;
+    }
 }
 
 @end

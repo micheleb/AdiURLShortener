@@ -28,16 +28,19 @@
 #import "Prefs.h"
 
 #define APP_NAME @"AdiURLShortener"
-#define KEY_ENABLED	@"Enable automatic shortening of URLs"
-#define KEY_URL_MIN_LENGTH @"Minimum URL length to shorten"
-#define KEY_SHORTENER_TYPE @"Shortening style"
+#define KEY_INCOMING_ENABLED	@"Automatic shortening of incoming messages"
+#define KEY_OUTGOING_ENABLED	@"Automatic shortening of outgoing messages"
+#define KEY_MIN_INCOMING        @"Minimum URL length to shorten for incoming messages"
+#define KEY_MIN_OUTGOING        @"Minimum URL length to shorten for outgoing messages"
+#define KEY_SHORTENER_TYPE @"Shortening style for outgoing messages"
 #define VALUE_PRETTIFY 0
 #define VALUE_GOO_GL 1
-#define FORMAT_SHORT_URL @"adi_url"
+
 @interface AdiURLShortener : AIPlugin <AIContentFilter> {
     AIPreferencePane *prefs;
 }
 
-@property(strong) AdiURLPrettifier *prettifier;
+@property(strong) AdiURLPrettifier *incomingPrettifier;
+@property(strong) AdiURLPrettifier *outgoingPrettifier;
 
 @end

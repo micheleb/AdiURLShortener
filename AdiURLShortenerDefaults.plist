@@ -2,11 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Enable automatic shortening of URLs</key>
+	<key>Automatic shortening of incoming messages</key>
 	<true/>
-	<key>Minimum URL length to shorten</key>
+	<key>Minimum URL length to shorten for incoming messages</key>
 	<integer>30</integer>
-	<key>Shortening style</key>
-	<integer>0</integer>
+	<key>Automatic shortening of outgoing messages</key>
+	<true/>
+	<key>Minimum URL length to shorten for outgoing messages</key>
+	<integer>30</integer>
+	<key>Shortening style for outgoing messages</key>
+	<integer>1</integer>
 </dict>
 </plist>

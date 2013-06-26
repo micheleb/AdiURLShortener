@@ -26,16 +26,33 @@
 
 @implementation AdiURLPrettifier
 
+- (id) initWithDirection:(AIFilterDirection)direct {
+    self = [super init];
+    self->direction = direct;
+    return self;
+}
+
 - (NSString *)filterHTMLString:(NSString *)inHTMLString content:(AIContentObject *)content {
-    if ([[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue] == VALUE_PRETTIFY) {
+    if (direction == AIFilterIncoming || [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue] == VALUE_PRETTIFY) {
+        NSString *minLengthKey, *enabledKey;
+        if (direction == AIFilterIncoming) {
+            enabledKey = KEY_INCOMING_ENABLED;
+            minLengthKey = KEY_MIN_INCOMING;
+        } else {
+            enabledKey = KEY_OUTGOING_ENABLED;
+            minLengthKey = KEY_MIN_OUTGOING;
+        }
+        if (![[adium preferenceController] preferenceForKey:enabledKey group:APP_NAME]) {
+            return inHTMLString;
+        }
         NSMutableString *builder = [NSMutableString string];
-        int minLengthToShorten = [[[adium preferenceController] preferenceForKey:KEY_URL_MIN_LENGTH group:APP_NAME] intValue];
+        int minLengthToShorten =  [[[adium preferenceController] preferenceForKey:minLengthKey group:APP_NAME] intValue];
         int index = 0;
         // these are here so not to conflict with the awesome adinline plugin
         NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
         NSError *error = nil;
         // let's grab all links
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a href=\"([^\"]+)\".+</a>" options:0 error:&error];
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a href=\"([^\"]+)\".+>(.*)</a>" options:0 error:&error];
         NSArray *matches = [regex matchesInString:inHTMLString options:0 range:NSMakeRange(0, [inHTMLString length])];
         for (NSTextCheckingResult *match in matches) {
             NSRange matchRange = [match range];
@@ -44,8 +61,11 @@
             NSString *matchText = [inHTMLString substringWithRange:matchRange];
             if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
                 NSString *url = [inHTMLString substringWithRange:[match rangeAtIndex:1]];
-                if ([url length] > minLengthToShorten) {
+                NSString *urlName = [inHTMLString substringWithRange:[match rangeAtIndex:2]];
+                if ([urlName length] > minLengthToShorten && [url length] > minLengthToShorten) {
                     [builder appendString:[self shorten:url]];
+                } else {
+                    [builder appendString:matchText];
                 }
             } else {
                 NSLog(@"link to an image: %@", matchText);

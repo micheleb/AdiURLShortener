@@ -23,7 +23,9 @@
 #import <Adium/AIContentControllerProtocol.h>
 
 @interface AdiURLPrettifier : NSObject<AIHTMLContentFilter> {
-    
+    @public AIFilterDirection direction;
 }
+
+- (id) initWithDirection: (AIFilterDirection)direction;
 
 @end
