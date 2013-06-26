@@ -68,7 +68,7 @@
                     [builder appendString:matchText];
                 }
             } else {
-                NSLog(@"link to an image: %@", matchText);
+//                NSLog(@"link to an image: %@", matchText);
                 [builder appendString:matchText];
             }
         }
@@ -82,13 +82,13 @@
 
 - (NSString *)shorten:(NSString *)url {
     NSError *error = nil;
-    NSLog(@"this is the string to shorten: %@", url);
+//    NSLog(@"this is the string to shorten: %@", url);
     // let's take the domain and drop all the rest
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(http|https)://w{0,3}\\.?[^/]+" options:0 error:&error];
     NSRange rangeOfFirst = [regex rangeOfFirstMatchInString:url options:0 range:NSMakeRange(0, [url length])];
     if (!NSEqualRanges(rangeOfFirst, NSMakeRange(NSNotFound, 0))) {
         NSString *domain = [url substringWithRange:rangeOfFirst];
-        NSLog(@"this is the url: %@, this is the domain: %@", url, domain);
+//        NSLog(@"this is the url: %@, this is the domain: %@", url, domain);
         return [NSString stringWithFormat:@"<a href=\"%1$@\" title=\"%1$@\">%2$@/shortened</a>", url, domain];
     }
     return url;

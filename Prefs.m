@@ -96,7 +96,6 @@
 
 - (IBAction)radioSelectorAction:(id)sender {
     NSInteger selectedItem=[sender selectedRow];
-    NSLog(@"Radio selector %li",(long)selectedItem);
     
     [self setPreference:[NSNumber numberWithInt:(int)selectedItem] forKey:KEY_SHORTENER_TYPE];
     

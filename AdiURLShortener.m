@@ -75,7 +75,7 @@
                     if ([url length] > minLengthToShorten) {
                         [self shortenWithGooGl:url using:replacements withQueue:shortenedUrls];                    }
                 } else {
-                    NSLog(@"link to an image: %@", matchText);
+//                    NSLog(@"link to an image: %@", matchText);
                 }
             }
             [shortenedUrls waitUntilAllOperationsAreFinished];
@@ -100,7 +100,7 @@
             replace = [[replacements valueForKey:key] shortened];
         if (replace) {
             [string replaceOccurrencesOfString:key withString:replace options: NSLiteralSearch range:NSMakeRange(0, [string length])];
-            NSLog(@"this is the replaced string: %@", string);
+//            NSLog(@"this is the replaced string: %@", string);
         }
     }
     return string;
@@ -119,7 +119,7 @@
 }
 
 - (NSString *)pluginDescription {
-	return @"This plugin shortens non-image links that you're about to send using Google's URL Shortener API.";
+	return @"This plugin shortens non-image links that you either send, receive or both.";
 }
 
 - (NSString *)pluginURL {

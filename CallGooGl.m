@@ -18,7 +18,7 @@
 
 - (void)main {
     @autoreleasepool {
-        NSLog(@"shortening %@...", _url);
+//        NSLog(@"shortening %@...", _url);
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:@"https://www.googleapis.com/urlshortener/v1/url"]];
         [request setHTTPMethod:@"POST"];
         
@@ -39,7 +39,7 @@
             json = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
             _shortened = [json valueForKey:@"id"];
         } else {
-            NSLog(@"statusCode is %ld", (long)statusCode);
+            NSLog(@"goo.gl call failed, statusCode is %ld", (long)statusCode);
         }
     }
 }
