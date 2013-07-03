@@ -69,14 +69,12 @@
             
             for (NSTextCheckingResult *match in matches) {
                 NSString *matchText = [typed substringWithRange:[match range]];
-                if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
+                if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] || ![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
                     NSRange range = [match rangeAtIndex:1];
                     NSString *url = [typed substringWithRange:range];
                     if ([url length] > minLengthToShorten) {
                         [self shortenWithGooGl:url using:replacements withQueue:shortenedUrls];                    }
-                } else {
-//                    NSLog(@"link to an image: %@", matchText);
-                }
+                } // else don't shorten
             }
             [shortenedUrls waitUntilAllOperationsAreFinished];
             if ([replacements count]) {
@@ -107,7 +105,7 @@
 }
 
 - (CGFloat)filterPriority {
-	return (CGFloat)LOWEST_FILTER_PRIORITY;
+	return (CGFloat)HIGHEST_FILTER_PRIORITY;
 }
 
 - (NSString *)pluginAuthor {
@@ -115,11 +113,11 @@
 }
 
 - (NSString *)pluginVersion {
-	return @"0.2";
+	return @"0.3";
 }
 
 - (NSString *)pluginDescription {
-	return @"This plugin shortens non-image links that you either send, receive or both.";
+	return @"This plugin shortens links that you either send, receive or both.";
 }
 
 - (NSString *)pluginURL {

@@ -28,6 +28,7 @@
 #import "Prefs.h"
 
 #define APP_NAME @"AdiURLShortener"
+#define KEY_SHORTEN_IMAGE_LINKS @"Shorten image links"
 #define KEY_INCOMING_ENABLED	@"Automatic shortening of incoming messages"
 #define KEY_OUTGOING_ENABLED	@"Automatic shortening of outgoing messages"
 #define KEY_MIN_INCOMING        @"Minimum URL length to shorten for incoming messages"

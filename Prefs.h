@@ -27,6 +27,7 @@
 @interface Prefs : AIAdvancedPreferencePane {}
 
 // items that set preferences
+@property (assign) IBOutlet NSButton *shortenImageLinks;
 @property (assign) IBOutlet NSButton *incomingEnabled;
 @property (assign) IBOutlet NSTextField *incomingMinLength;
 @property (assign) IBOutlet NSButton *outgoingEnabled;

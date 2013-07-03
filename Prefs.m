@@ -47,17 +47,20 @@
 }
 
 
--(void)viewDidLoad {    
-    NSInteger incomingEnabled=[[[adium preferenceController] preferenceForKey:KEY_INCOMING_ENABLED
-        group:APP_NAME] boolValue];
+-(void)viewDidLoad {
+    NSInteger shortenImageLinks = [[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue];
+    [_shortenImageLinks setState:shortenImageLinks];
+    
+    NSInteger incomingEnabled = [[[adium preferenceController] preferenceForKey:KEY_INCOMING_ENABLED
+                                                                          group:APP_NAME] boolValue];
     [_incomingEnabled setState:incomingEnabled];
     [_incomingMinLength setEnabled:incomingEnabled];
     
     NSInteger minIncomingLength = [[[adium preferenceController] preferenceForKey:KEY_MIN_INCOMING group:APP_NAME] intValue];
     [_incomingMinLength setStringValue:[NSString stringWithFormat:@"%li", minIncomingLength]];
     
-    NSInteger outgoingEnabled=[[[adium preferenceController] preferenceForKey:KEY_OUTGOING_ENABLED
-                                                                        group:APP_NAME] boolValue];
+    NSInteger outgoingEnabled = [[[adium preferenceController] preferenceForKey:KEY_OUTGOING_ENABLED
+                                                                          group:APP_NAME] boolValue];
     [_outgoingEnabled setState:outgoingEnabled];
     [_outgoingMinLength setEnabled:outgoingEnabled];
     
@@ -80,7 +83,9 @@
 }
 
 - (IBAction)changePreference:(id)sender {
-    if (sender == _incomingEnabled) {
+    if (sender == _shortenImageLinks) {
+        [self setPreference:[NSNumber numberWithBool:[sender state]] forKey:KEY_SHORTEN_IMAGE_LINKS];
+    } else if (sender == _incomingEnabled) {
         [self setPreference: [NSNumber numberWithBool:[sender state]] forKey:KEY_INCOMING_ENABLED];
         [_incomingMinLength setEnabled:[sender state]];
     } else if (sender == _outgoingEnabled) {

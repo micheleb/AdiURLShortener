@@ -58,17 +58,16 @@
             NSRange matchRange = [match range];
             [builder appendString:[inHTMLString substringWithRange:NSMakeRange(index, (matchRange.location - index))]];
             index = (int)(matchRange.location + matchRange.length);
+            NSString *url = [inHTMLString substringWithRange:[match rangeAtIndex:1]];
+            NSString *urlName = [inHTMLString substringWithRange:[match rangeAtIndex:2]];
             NSString *matchText = [inHTMLString substringWithRange:matchRange];
-            if (![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
-                NSString *url = [inHTMLString substringWithRange:[match rangeAtIndex:1]];
-                NSString *urlName = [inHTMLString substringWithRange:[match rangeAtIndex:2]];
+            if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] || ![imageExtensions containsObject:[[[[NSURL URLWithString:url] path] pathExtension] lowercaseString]]) {
                 if ([urlName length] > minLengthToShorten && [url length] > minLengthToShorten) {
                     [builder appendString:[self shorten:url]];
                 } else {
                     [builder appendString:matchText];
                 }
             } else {
-//                NSLog(@"link to an image: %@", matchText);
                 [builder appendString:matchText];
             }
         }
@@ -95,7 +94,7 @@
 }
 
 - (CGFloat)filterPriority {
-	return (CGFloat)LOWEST_FILTER_PRIORITY;
+	return (CGFloat)HIGHEST_FILTER_PRIORITY;
 }
 
 @end
