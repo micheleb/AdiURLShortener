@@ -51,6 +51,8 @@
 - (NSAttributedString *)filterAttributedString:(NSAttributedString *)inAttributedString context:(id)context {
     NSAttributedString *returnMe = inAttributedString;
     int shortenerType = [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue];
+    
+    // check if outgoing links must be shortened, if style is prettify ignore
     if ([[[adium preferenceController] preferenceForKey:KEY_OUTGOING_ENABLED group:APP_NAME] boolValue] && shortenerType == VALUE_GOO_GL) {
         NSString *typed = [inAttributedString string];
         NSMutableString *changed = [[NSMutableString alloc]initWithString:typed];
@@ -69,12 +71,15 @@
             
             for (NSTextCheckingResult *match in matches) {
                 NSString *matchText = [typed substringWithRange:[match range]];
-                if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] || ![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
+                // only shorten image links if the user said so
+                if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] ||
+                    ![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
                     NSRange range = [match rangeAtIndex:1];
                     NSString *url = [typed substringWithRange:range];
                     if ([url length] > minLengthToShorten) {
-                        [self shortenWithGooGl:url using:replacements withQueue:shortenedUrls];                    }
-                } // else don't shorten
+                        [self shortenWithGooGl:url using:replacements withQueue:shortenedUrls];
+                    }
+                }
             }
             [shortenedUrls waitUntilAllOperationsAreFinished];
             if ([replacements count]) {
@@ -98,7 +103,6 @@
             replace = [[replacements valueForKey:key] shortened];
         if (replace) {
             [string replaceOccurrencesOfString:key withString:replace options: NSLiteralSearch range:NSMakeRange(0, [string length])];
-//            NSLog(@"this is the replaced string: %@", string);
         }
     }
     return string;
@@ -113,7 +117,7 @@
 }
 
 - (NSString *)pluginVersion {
-	return @"0.3";
+	return @"0.4";
 }
 
 - (NSString *)pluginDescription {

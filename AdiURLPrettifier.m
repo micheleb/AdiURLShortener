@@ -33,61 +33,88 @@
 }
 
 - (NSString *)filterHTMLString:(NSString *)inHTMLString content:(AIContentObject *)content {
-    if (direction == AIFilterIncoming || [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue] == VALUE_PRETTIFY) {
-        NSString *minLengthKey, *enabledKey;
-        if (direction == AIFilterIncoming) {
-            enabledKey = KEY_INCOMING_ENABLED;
-            minLengthKey = KEY_MIN_INCOMING;
-        } else {
-            enabledKey = KEY_OUTGOING_ENABLED;
-            minLengthKey = KEY_MIN_OUTGOING;
-        }
-        if (![[adium preferenceController] preferenceForKey:enabledKey group:APP_NAME]) {
-            return inHTMLString;
-        }
-        NSMutableString *builder = [NSMutableString string];
-        int minLengthToShorten =  [[[adium preferenceController] preferenceForKey:minLengthKey group:APP_NAME] intValue];
-        int index = 0;
-        // these are here so not to conflict with the awesome adinline plugin
-        NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
-        NSError *error = nil;
-        // let's grab all links
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a href=\"([^\"]+)\".+>(.*)</a>" options:0 error:&error];
-        NSArray *matches = [regex matchesInString:inHTMLString options:0 range:NSMakeRange(0, [inHTMLString length])];
-        for (NSTextCheckingResult *match in matches) {
-            NSRange matchRange = [match range];
-            [builder appendString:[inHTMLString substringWithRange:NSMakeRange(index, (matchRange.location - index))]];
-            index = (int)(matchRange.location + matchRange.length);
-            NSString *url = [inHTMLString substringWithRange:[match rangeAtIndex:1]];
-            NSString *urlName = [inHTMLString substringWithRange:[match rangeAtIndex:2]];
-            NSString *matchText = [inHTMLString substringWithRange:matchRange];
-            if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] || ![imageExtensions containsObject:[[[[NSURL URLWithString:url] path] pathExtension] lowercaseString]]) {
-                if ([urlName length] > minLengthToShorten && [url length] > minLengthToShorten) {
-                    [builder appendString:[self shorten:url]];
-                } else {
-                    [builder appendString:matchText];
-                }
+    int index = 0;
+    @try {
+        // incoming links are never sent to goo.gl
+        if (direction == AIFilterIncoming ||
+            [[[adium preferenceController] preferenceForKey:KEY_SHORTENER_TYPE group:APP_NAME] intValue] == VALUE_PRETTIFY) {
+            NSString *minLengthKey, *enabledKey;
+            
+            // check preferences
+            if (direction == AIFilterIncoming) {
+                enabledKey = KEY_INCOMING_ENABLED;
+                minLengthKey = KEY_MIN_INCOMING;
             } else {
-                [builder appendString:matchText];
+                enabledKey = KEY_OUTGOING_ENABLED;
+                minLengthKey = KEY_MIN_OUTGOING;
             }
+            if (![[[adium preferenceController] preferenceForKey:enabledKey group:APP_NAME] boolValue]) {
+                // not enabled
+                return inHTMLString;
+            }
+            
+            // we'll use this to build our result string
+            NSMutableString *builder = [NSMutableString string];
+            int minLengthToShorten =  [[[adium preferenceController] preferenceForKey:minLengthKey group:APP_NAME] intValue];
+            
+            // these are here so not to conflict with the awesome adinline plugin
+            NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
+            NSError *error = nil;
+            
+            // let's grab all links
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a[^>]*href\\s*=\\s*\"(http(?:s)?://[^\"]+)\"[^>]*>([^<]*)</a>" options:0 error:&error];
+            NSArray *matches = [regex matchesInString:inHTMLString options:0 range:NSMakeRange(0, [inHTMLString length])];
+            
+            for (NSTextCheckingResult *match in matches) {
+                NSRange matchRange = [match range];
+                
+                if (matchRange.location > index) {
+                    // add everything between last match and this match, as in
+                    // <a href="...">...</a> ADD THIS <a href="...">...
+                    [builder appendString:[inHTMLString substringWithRange:NSMakeRange(index, (matchRange.location - index))]];
+                }
+                index = (int)(matchRange.location + matchRange.length);
+                
+                NSString *fullLink = [inHTMLString substringWithRange:matchRange];
+                NSString *url = [inHTMLString substringWithRange:[match rangeAtIndex:1]];
+                NSString *urlName = [inHTMLString substringWithRange:[match rangeAtIndex:2]];
+                
+                // if it's an image link, don't shorten unless the user said so
+                if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] ||
+                    ![imageExtensions containsObject:[[[[NSURL URLWithString:url] path] pathExtension] lowercaseString]]) {
+                    if ([urlName hasPrefix:@"http"] && [urlName length] > minLengthToShorten && [url length] > minLengthToShorten) {
+                        [builder appendString:[self shorten:url]];
+                    } else {
+                        // don't prettify links that are already pretty!
+                        [builder appendString:fullLink];
+                    }
+                } else {
+                    [builder appendString:fullLink];
+                }
+            }
+            
+            // append whatever we got after the last match
+            if (index < [inHTMLString length] - 1) {
+                [builder appendString:[inHTMLString substringFromIndex:index]];
+            }
+            return builder;
         }
-        if (index < [inHTMLString length]) {
-            [builder appendString:[inHTMLString substringFromIndex:index]];
-        }
-        return builder;
+    } @catch (NSException *e) {
+        // if all goes wrong...
+        NSLog(@"d'oh, %@; index was %d", e, index);
     }
     return inHTMLString;
 }
 
 - (NSString *)shorten:(NSString *)url {
     NSError *error = nil;
-//    NSLog(@"this is the string to shorten: %@", url);
     // let's take the domain and drop all the rest
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(http|https)://w{0,3}\\.?[^/]+" options:0 error:&error];
+    // links are passed to this function one at the time
     NSRange rangeOfFirst = [regex rangeOfFirstMatchInString:url options:0 range:NSMakeRange(0, [url length])];
+    
     if (!NSEqualRanges(rangeOfFirst, NSMakeRange(NSNotFound, 0))) {
         NSString *domain = [url substringWithRange:rangeOfFirst];
-//        NSLog(@"this is the url: %@, this is the domain: %@", url, domain);
         return [NSString stringWithFormat:@"<a href=\"%1$@\" title=\"%1$@\">%2$@/shortened</a>", url, domain];
     }
     return url;
