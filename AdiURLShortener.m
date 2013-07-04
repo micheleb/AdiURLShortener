@@ -37,6 +37,8 @@
     }
     _incomingPrettifier = [[AdiURLPrettifier alloc] init];
     _outgoingPrettifier = [[AdiURLPrettifier alloc] init];
+    
+    // goo.gl shortening is only outbound, register prettifier for both in&out
     [[adium contentController] registerContentFilter:self ofType:AIFilterContent direction:AIFilterOutgoing];
     [[adium contentController] registerHTMLContentFilter:_incomingPrettifier direction:AIFilterIncoming];
     [[adium contentController] registerHTMLContentFilter:_outgoingPrettifier direction:AIFilterOutgoing];
@@ -55,27 +57,37 @@
     // check if outgoing links must be shortened, if style is prettify ignore
     if ([[[adium preferenceController] preferenceForKey:KEY_OUTGOING_ENABLED group:APP_NAME] boolValue] && shortenerType == VALUE_GOO_GL) {
         NSString *typed = [inAttributedString string];
-        NSMutableString *changed = [[NSMutableString alloc]initWithString:typed];
-        NSUInteger typedLength = [typed length];
+        NSMutableString *changed = [NSMutableString string];
+        
+        // first, look for hyperlinks (links drag-and-dropped to the input field)
+        [inAttributedString enumerateAttributesInRange:NSMakeRange(0, [inAttributedString length]) options:0 usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
+            NSString *chunk = [typed substringWithRange:range];
+            if ([attrs objectForKey:@"NSLink"]) {
+                chunk = [NSString stringWithFormat:@"%@", [attrs objectForKey:@"NSLink"]];
+            }
+            [changed appendString:chunk];
+        }];
+        
+        NSUInteger changedLength = [changed length];
         int minLengthToShorten = [[[adium preferenceController] preferenceForKey:KEY_MIN_OUTGOING group:APP_NAME] intValue];
         
-        if (typedLength > minLengthToShorten) {
+        if (changedLength > minLengthToShorten) {
             NSError *error = nil;
             // these are here so not to conflict with the awesome adinline plugin
             NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
             
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"((http|https)://w{0,3}\\.?[^\\s]+)" options:0 error:&error];
-            NSArray *matches = [regex matchesInString:typed options:0 range:NSMakeRange(0, typedLength)];
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"((http|https)://w{0,3}\\.?[^\\s]+)" options:NSRegularExpressionCaseInsensitive error:&error];
+            NSArray *matches = [regex matchesInString:changed options:0 range:NSMakeRange(0, changedLength)];
             NSMutableDictionary *replacements = [[NSMutableDictionary alloc] init];
             NSOperationQueue *shortenedUrls = [[NSOperationQueue alloc] init];
             
             for (NSTextCheckingResult *match in matches) {
-                NSString *matchText = [typed substringWithRange:[match range]];
+                NSString *matchText = [changed substringWithRange:[match range]];
                 // only shorten image links if the user said so
                 if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] ||
                     ![imageExtensions containsObject:[[[[NSURL URLWithString:matchText] path] pathExtension] lowercaseString]]) {
                     NSRange range = [match rangeAtIndex:1];
-                    NSString *url = [typed substringWithRange:range];
+                    NSString *url = [changed substringWithRange:range];
                     if ([url length] > minLengthToShorten) {
                         [self shortenWithGooGl:url using:replacements withQueue:shortenedUrls];
                     }

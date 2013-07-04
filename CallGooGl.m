@@ -39,6 +39,7 @@
             json = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
             _shortened = [json valueForKey:@"id"];
         } else {
+            // leave _shortened empty so no replacement is made
             NSLog(@"goo.gl call failed, statusCode is %ld", (long)statusCode);
         }
     }

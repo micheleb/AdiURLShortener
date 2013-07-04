@@ -63,7 +63,7 @@
             
             // let's grab all links
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a[^>]*href\\s*=\\s*\"(http(?:s)?://[^\"]+)\"[^>]*>([^<]*)</a>" options:0 error:&error];
-            NSArray *matches = [regex matchesInString:inHTMLString options:0 range:NSMakeRange(0, [inHTMLString length])];
+            NSArray *matches = [regex matchesInString:inHTMLString options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [inHTMLString length])];
             
             for (NSTextCheckingResult *match in matches) {
                 NSRange matchRange = [match range];
@@ -109,7 +109,7 @@
 - (NSString *)shorten:(NSString *)url {
     NSError *error = nil;
     // let's take the domain and drop all the rest
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(http|https)://w{0,3}\\.?[^/]+" options:0 error:&error];
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(http|https)://w{0,3}\\.?[^/]+" options:NSRegularExpressionCaseInsensitive error:&error];
     // links are passed to this function one at the time
     NSRange rangeOfFirst = [regex rangeOfFirstMatchInString:url options:0 range:NSMakeRange(0, [url length])];
     
