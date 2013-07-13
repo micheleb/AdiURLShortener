@@ -35,8 +35,8 @@
     if (defaults) {
         [[adium preferenceController] registerDefaults:defaults forGroup:APP_NAME];
     }
-    _incomingPrettifier = [[AdiURLPrettifier alloc] init];
-    _outgoingPrettifier = [[AdiURLPrettifier alloc] init];
+    _incomingPrettifier = [[AdiURLPrettifier alloc] initWithDirection:AIFilterIncoming];
+    _outgoingPrettifier = [[AdiURLPrettifier alloc] initWithDirection:AIFilterOutgoing];
     
     // goo.gl shortening is only outbound, register prettifier for both in&out
     [[adium contentController] registerContentFilter:self ofType:AIFilterContent direction:AIFilterOutgoing];
@@ -129,7 +129,7 @@
 }
 
 - (NSString *)pluginVersion {
-	return @"0.4";
+	return @"0.4.2";
 }
 
 - (NSString *)pluginDescription {

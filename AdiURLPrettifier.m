@@ -94,7 +94,7 @@
             }
             
             // append whatever we got after the last match
-            if (index < [inHTMLString length] - 1) {
+            if (index < [inHTMLString length]) {
                 [builder appendString:[inHTMLString substringFromIndex:index]];
             }
             return builder;
