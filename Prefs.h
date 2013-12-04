@@ -33,6 +33,7 @@
 @property (assign) IBOutlet NSButton *outgoingEnabled;
 @property (assign) IBOutlet NSTextField *outgoingMinLength;
 @property (assign) IBOutlet NSMatrix *whichShortener;
+@property (assign) IBOutlet NSButton *convertDropboxLinks;
 
 // items that do nothing at all
 @property (assign) IBOutlet NSTextField *prettifyWarning;

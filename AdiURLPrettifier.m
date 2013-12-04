@@ -61,11 +61,18 @@
             NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
             NSError *error = nil;
             
-            // let's grab all links
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a[^>]*href\\s*=\\s*\"(http(?:s)?://[^\"]+)\"[^>]*>([^<]*)</a>" options:0 error:&error];
-            NSArray *matches = [regex matchesInString:inHTMLString options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0, [inHTMLString length])];
+            // check if there are dropbox links first
+            if ([[[adium preferenceController] preferenceForKey:KEY_CONVERT_DROPBOX_LINKS group:APP_NAME] boolValue]) {
+                // a dropbox link, and user wants to change them
+                inHTMLString = [inHTMLString stringByReplacingOccurrencesOfString:@"www.dropbox.com" withString:@"dl.dropbox.com" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [inHTMLString length])];
+            }
             
-            for (NSTextCheckingResult *match in matches) {
+            // let's grab all links
+            NSRange searchRange = NSMakeRange(0, [inHTMLString length]);
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<a[^>]*href\\s*=\\s*\"(http(?:s)?://[^\"]+)\"[^>]*>([^<]*)</a>" options:0 error:&error];
+            NSArray *linkMatches = [regex matchesInString:inHTMLString options:NSRegularExpressionCaseInsensitive range:searchRange];
+            
+            for (NSTextCheckingResult *match in linkMatches) {
                 NSRange matchRange = [match range];
                 
                 if (matchRange.location > index) {
@@ -78,7 +85,7 @@
                 NSString *fullLink = [inHTMLString substringWithRange:matchRange];
                 NSString *url = [inHTMLString substringWithRange:[match rangeAtIndex:1]];
                 NSString *urlName = [inHTMLString substringWithRange:[match rangeAtIndex:2]];
-                
+
                 // if it's an image link, don't shorten unless the user said so
                 if ([[[adium preferenceController] preferenceForKey:KEY_SHORTEN_IMAGE_LINKS group:APP_NAME] boolValue] ||
                     ![imageExtensions containsObject:[[[[NSURL URLWithString:url] path] pathExtension] lowercaseString]]) {
@@ -115,6 +122,11 @@
     
     if (!NSEqualRanges(rangeOfFirst, NSMakeRange(NSNotFound, 0))) {
         NSString *domain = [url substringWithRange:rangeOfFirst];
+        
+        if ([url length] <= [domain length] + 5) {
+            // don't add the "shortened" part if there's nothing after the domain
+            return [NSString stringWithFormat:@"<a href=\"%1$@\" title=\"%1$@\">%2$@</a>", url, domain];
+        }
         return [NSString stringWithFormat:@"<a href=\"%1$@\" title=\"%1$@\">%2$@/shortened</a>", url, domain];
     }
     return url;

@@ -34,8 +34,10 @@
 #define KEY_MIN_INCOMING        @"Minimum URL length to shorten for incoming messages"
 #define KEY_MIN_OUTGOING        @"Minimum URL length to shorten for outgoing messages"
 #define KEY_SHORTENER_TYPE @"Shortening style for outgoing messages"
+#define KEY_CONVERT_DROPBOX_LINKS @"Direct link Dropbox URLs"
 #define VALUE_PRETTIFY 0
 #define VALUE_GOO_GL 1
+
 
 @interface AdiURLShortener : AIPlugin <AIContentFilter> {
     AIPreferencePane *prefs;

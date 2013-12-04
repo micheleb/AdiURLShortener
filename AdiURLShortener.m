@@ -76,8 +76,16 @@
             // these are here so not to conflict with the awesome adinline plugin
             NSArray *imageExtensions = @[@"png", @"jpg", @"jpeg", @"tif", @"tiff", @"gif", @"bmp"];
             
+            // check if it's a dropbox link first
+            if ([[[adium preferenceController] preferenceForKey:KEY_CONVERT_DROPBOX_LINKS group:APP_NAME] boolValue]) {
+                // a dropbox link, and user wants to change them
+                [changed replaceOccurrencesOfString:@"www.dropbox.com" withString:@"dl.dropbox.com" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [changed length])];
+                changedLength = [changed length];
+            }
+            
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"((http|https)://w{0,3}\\.?[^\\s]+)" options:NSRegularExpressionCaseInsensitive error:&error];
             NSArray *matches = [regex matchesInString:changed options:0 range:NSMakeRange(0, changedLength)];
+            
             NSMutableDictionary *replacements = [[NSMutableDictionary alloc] init];
             NSOperationQueue *shortenedUrls = [[NSOperationQueue alloc] init];
             
@@ -129,7 +137,7 @@
 }
 
 - (NSString *)pluginVersion {
-	return @"0.4.2";
+	return @"0.5.0";
 }
 
 - (NSString *)pluginDescription {

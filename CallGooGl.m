@@ -41,6 +41,7 @@
         } else {
             // leave _shortened empty so no replacement is made
             NSLog(@"goo.gl call failed, statusCode is %ld", (long)statusCode);
+            _shortened = _url;
         }
     }
 }

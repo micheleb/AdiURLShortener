@@ -71,6 +71,9 @@
     [_whichShortener selectCellWithTag:type];
     if (type == VALUE_PRETTIFY)
         _prettifyWarning.hidden = false;
+    
+    NSInteger convertDropboxLinks = [[[adium preferenceController] preferenceForKey:KEY_CONVERT_DROPBOX_LINKS group:APP_NAME] boolValue];
+    [_convertDropboxLinks setState:convertDropboxLinks];
 }
 
 -(void) setPreference: (id)value forKey:(NSString *)key {
@@ -92,10 +95,13 @@
         [self setPreference: [NSNumber numberWithBool:[sender state]] forKey:KEY_OUTGOING_ENABLED];
         [_outgoingMinLength setEnabled:[sender state]];
         [_whichShortener setEnabled:[sender state]];
+        [_convertDropboxLinks setEnabled:[sender state]];
     } else if (sender == _incomingMinLength) {
         [self setPreference:[NSNumber numberWithInt:[[sender stringValue] intValue]] forKey:KEY_MIN_INCOMING];
     } else if (sender == _outgoingMinLength) {
         [self setPreference:[NSNumber numberWithInt:[[sender stringValue] intValue]] forKey:KEY_MIN_OUTGOING];
+    } else if (sender == _convertDropboxLinks) {
+        [self setPreference:[NSNumber numberWithBool:[sender state]] forKey:KEY_CONVERT_DROPBOX_LINKS];
     }
 }
 
